@@ -1,0 +1,80 @@
+import { useContext, useEffect, useRef, useState } from "react";
+
+// CONTEXT
+import { GlobalContext } from "@/contexts/global.context";
+
+// COMPONENTS
+import NavComponent from "@/components/_shared/nav/nav.component";
+import FooterComponent from "@/components/_shared/footer/footer.component";
+import BannerComponent from "@/components/_shared/banner/banner.component";
+import FormReservationsComponent from "@/components/reservations/form.reservations.component";
+import SeoHeadComponent from "@/components/_shared/seo/seo-head.component";
+import { buildStaticPageProps } from "@/_assets/utils/page-props.utils";
+
+export default function ReservationsPage({ seoRestaurantData = null }) {
+  const { restaurantContext } = useContext(GlobalContext);
+
+  const heroRef = useRef(null);
+  const [showScrolledNav, setShowScrolledNav] = useState(false);
+
+  useEffect(() => {
+    const heroEl = heroRef.current;
+    if (!heroEl) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setShowScrolledNav(entry.intersectionRatio <= 0.1);
+      },
+      {
+        threshold: [0, 0.05, 0.1, 0.25, 0.5, 0.75, 1],
+      },
+    );
+
+    observer.observe(heroEl);
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <>
+      <SeoHeadComponent
+        title="Réserver | L'Esprit Jacasse"
+        description="Réservez une table chez Jacasse et choisissez en ligne votre date, votre horaire et votre nombre de convives."
+        path="/reservations"
+        image="/img/home/art.webp"
+        breadcrumbs={[
+          { name: "Accueil", path: "/" },
+          { name: "Réserver", path: "/reservations" },
+        ]}
+        restaurantData={seoRestaurantData}
+      />
+
+      <div className="relative">
+        <NavComponent isVisible={!showScrolledNav} scrolled={false} />
+
+        <NavComponent isVisible={showScrolledNav} scrolled={true} />
+
+        <div ref={heroRef}>
+          <BannerComponent
+            title="Réserver une table"
+            eyebrow="À votre table"
+            description="Préparez votre venue chez Jacasse et choisissez le créneau qui vous convient en quelques instants."
+            imgUrl="home/art.webp"
+          />
+        </div>
+
+        <FormReservationsComponent
+          apiBaseUrl={process.env.NEXT_PUBLIC_API_URL}
+          restaurant={restaurantContext.restaurantData}
+          dataLoading={restaurantContext.dataLoading}
+        />
+
+        <FooterComponent />
+      </div>
+    </>
+  );
+}
+
+export async function getStaticProps({ locale }) {
+  return buildStaticPageProps(locale, ["common"]);
+}
