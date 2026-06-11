@@ -38,6 +38,11 @@ a {
   text-decoration: none;
 }
 
+img {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
 .yeseva-one-regular {
   font-family: var(--font-cormorant-garamond), serif;
   font-weight: 600;

@@ -69,6 +69,24 @@ function TrackVisits() {
   return null;
 }
 
+function DisableImageDragging() {
+  useEffect(() => {
+    function handleDragStart(event) {
+      if (event.target instanceof HTMLImageElement) {
+        event.preventDefault();
+      }
+    }
+
+    document.addEventListener("dragstart", handleDragStart);
+
+    return () => {
+      document.removeEventListener("dragstart", handleDragStart);
+    };
+  }, []);
+
+  return null;
+}
+
 function App({ Component, pageProps }) {
   return (
     <div
@@ -76,6 +94,7 @@ function App({ Component, pageProps }) {
     >
       <GlobalProvider>
         <TrackVisits />
+        <DisableImageDragging />
         <Component {...pageProps} />
       </GlobalProvider>
     </div>
