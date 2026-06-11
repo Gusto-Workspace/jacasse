@@ -43,14 +43,17 @@ export default function NavComponent({ isVisible = true, scrolled = false }) {
   const router = useRouter();
   const { restaurantContext } = useContext(GlobalContext);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [shouldAnimateInitialReveal] = useState(!hasAssignedInitialNavReveal);
   const [hasStartedNewsVisibilityCheck, setHasStartedNewsVisibilityCheck] =
     useState(false);
-  const [newsVisibilityResolved, setNewsVisibilityResolved] = useState(false);
-  const [navReady, setNavReady] = useState(false);
+  const [newsVisibilityResolved, setNewsVisibilityResolved] = useState(
+    hasAssignedInitialNavReveal,
+  );
+  const [navReady, setNavReady] = useState(hasAssignedInitialNavReveal);
   const [animateOnMount, setAnimateOnMount] = useState(false);
-  const [mountReady, setMountReady] = useState(false);
+  const [mountReady, setMountReady] = useState(hasAssignedInitialNavReveal);
   const [visibilityTransitionsEnabled, setVisibilityTransitionsEnabled] =
-    useState(false);
+    useState(hasAssignedInitialNavReveal);
   const restaurantData = restaurantContext?.restaurantData;
   const restaurantDataLoading = restaurantContext?.dataLoading;
 
@@ -116,6 +119,10 @@ export default function NavComponent({ isVisible = true, scrolled = false }) {
   ]);
 
   useEffect(() => {
+    if (!shouldAnimateInitialReveal) {
+      return;
+    }
+
     if (!navReady) {
       return;
     }
@@ -141,7 +148,7 @@ export default function NavComponent({ isVisible = true, scrolled = false }) {
       if (firstFrame) window.cancelAnimationFrame(firstFrame);
       if (secondFrame) window.cancelAnimationFrame(secondFrame);
     };
-  }, [animateOnMount, navReady]);
+  }, [animateOnMount, navReady, shouldAnimateInitialReveal]);
 
   useEffect(() => {
     if (!menuOpen) {
