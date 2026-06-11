@@ -5,7 +5,6 @@ import NavComponent from "@/components/_shared/nav/nav.component";
 import FooterComponent from "@/components/_shared/footer/footer.component";
 import SeoHeadComponent from "@/components/_shared/seo/seo-head.component";
 import SectionHeadingComponent from "@/components/_shared/section-heading.component";
-import GraphicElementComponent from "@/components/_shared/graphic-element.component";
 import RevealOnScrollComponent from "@/components/_shared/motion/reveal-on-scroll.component";
 import { buildStaticPageProps } from "@/_assets/utils/page-props.utils";
 
@@ -125,19 +124,6 @@ export default function LegalesPage({ seoRestaurantData = null }) {
         </div>
 
         <section className="relative overflow-hidden bg-[var(--site-cream)] px-5 py-20 tablet:px-8 tablet:py-24 desktop:px-[90px] desktop:py-[110px]">
-          <GraphicElementComponent
-            src="/img/elements/2.webp"
-            className="left-[-42px] top-[140px] hidden h-[170px] w-[170px] opacity-30 desktop:block"
-            sizes="170px"
-            disableMotion
-          />
-          <GraphicElementComponent
-            src="/img/elements/4.webp"
-            className="bottom-[120px] right-[-38px] hidden h-[160px] w-[160px] opacity-30 desktop:block"
-            sizes="160px"
-            disableMotion
-          />
-
           <div className="relative z-10 mx-auto max-w-[1400px]">
             <SectionHeadingComponent
               eyebrow="Cadre légal"

@@ -311,7 +311,12 @@ export function buildSeoSchemas({
       url: baseUrl,
       image: imageUrl,
       logo: logoUrl,
-      servesCuisine: ["Cuisine italienne", "Pizzas", "Restaurant"],
+      servesCuisine: [
+        "Cuisine méditerranéenne",
+        "Tapas",
+        "Vins",
+        "Restaurant",
+      ],
       acceptsReservations: true,
       menu: buildAbsoluteUrl(baseUrl, "/menus"),
       telephone: normalizeText(restaurant?.phone) || undefined,

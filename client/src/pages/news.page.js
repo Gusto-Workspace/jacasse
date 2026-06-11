@@ -59,6 +59,7 @@ export default function NewsPage({ seoRestaurantData = null }) {
           className="relative min-h-[90svh] overflow-hidden bg-[url('/img/news/header.webp')] bg-cover bg-center text-[var(--site-cream)]"
         >
           <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(5,8,7,0.88)_0%,rgba(5,8,7,0.58)_44%,rgba(5,8,7,0.26)_100%)]" />
+
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,8,7,0.14)_0%,rgba(5,8,7,0.5)_100%)]" />
 
           <div className="relative mx-auto flex min-h-[90svh] w-full max-w-[1720px] items-center px-5 pb-24 pt-[150px] tablet:px-8 tablet:pb-28 desktop:px-12 desktop:pb-32">
@@ -77,10 +78,9 @@ export default function NewsPage({ seoRestaurantData = null }) {
               >
                 Ici, on partage plus que des assiettes :
                 <br />
-                des{" "}
-                <span className="text-[var(--site-orange)]">moments</span>, des{" "}
-                <span className="text-[var(--site-orange)]">idées</span> et des{" "}
-                <span className="text-[var(--site-orange)]">envies</span>.
+                des <span className="text-[var(--site-orange)]">moments</span>,
+                des <span className="text-[var(--site-orange)]">idées</span> et
+                des <span className="text-[var(--site-orange)]">envies</span>.
               </RevealOnScrollComponent>
             </div>
           </div>

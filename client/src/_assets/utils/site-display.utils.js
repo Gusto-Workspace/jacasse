@@ -45,7 +45,7 @@ export function getRestaurantLocationLabel(restaurant) {
     return `${city}, ${country}`;
   }
 
-  return city || country || "Corrèze";
+  return city || country || "Montauban";
 }
 
 function isMenuLikeText(value) {

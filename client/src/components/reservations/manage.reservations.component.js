@@ -23,10 +23,8 @@ import {
 
 import { GlobalContext } from "@/contexts/global.context";
 import { buildContactInfos } from "@/_assets/utils/contact.utils";
-import { getRestaurantBrandParts } from "@/_assets/utils/site-display.utils";
 import FooterComponent from "@/components/_shared/footer/footer.component";
 import BannerComponent from "@/components/_shared/banner/banner.component";
-import GraphicElementComponent from "@/components/_shared/graphic-element.component";
 import NavComponent from "@/components/_shared/nav/nav.component";
 import SectionHeadingComponent from "@/components/_shared/section-heading.component";
 import { parseReservationDateValue } from "@/utils/reservations";
@@ -38,7 +36,6 @@ export default function ManageReservationsComponent({
   const { restaurantContext } = useContext(GlobalContext);
   const restaurant = restaurantContext?.restaurantData;
   const restaurantLoading = restaurantContext?.dataLoading;
-  const brand = getRestaurantBrandParts();
   const heroRef = useRef(null);
   const [showScrolledNav, setShowScrolledNav] = useState(false);
 
@@ -211,17 +208,6 @@ export default function ManageReservationsComponent({
         </div>
 
         <section className="relative overflow-hidden px-5 pb-16 pt-4 tablet:px-8 tablet:pb-20 desktop:px-[90px]">
-          <GraphicElementComponent
-            src="/img/elements/9.webp"
-            className="left-[-30px] top-[120px] hidden h-[160px] w-[160px] opacity-20 desktop:block"
-            sizes="180px"
-          />
-          <GraphicElementComponent
-            src="/img/elements/10.webp"
-            className="bottom-[20px] right-[-20px] hidden h-[170px] w-[170px] opacity-20 desktop:block"
-            sizes="190px"
-          />
-
           <div className="relative z-10 mx-auto max-w-[1500px]">
             {isLoading || (reservation && restaurantLoading) ? (
               <StateCard

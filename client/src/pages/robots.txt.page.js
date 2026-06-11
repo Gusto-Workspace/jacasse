@@ -5,6 +5,9 @@ function buildRobotsTxt(baseUrl) {
 Allow: /
 
 Disallow: /404
+Disallow: /reservations/waitlist-offer/
+Disallow: /reservations/*/manage
+Disallow: /reservations/*/bank-hold
 
 Sitemap: ${baseUrl}/sitemap.xml
 `;
