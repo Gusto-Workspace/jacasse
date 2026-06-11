@@ -76,16 +76,16 @@ export default function FooterComponent() {
   return (
     <footer className="border-t border-[rgba(20,72,47,0.08)] bg-[var(--site-cream)] text-[var(--site-ink)]">
       <div className="mx-auto max-w-[1730px] px-5 py-10 tablet:px-8 tablet:py-12 desktop:px-[44px]">
-        <div className="grid gap-8 desktop:grid-cols-[1.15fr_1fr_1fr_1fr_0.92fr] desktop:gap-0">
-          <div className="desktop:pr-12">
-            <Link href="/" className="inline-flex items-center">
+        <div className="grid gap-8 desktop:grid-cols-[0.5fr_0.9fr_1fr_1fr_1.15fr] desktop:gap-0">
+          <div className="flex justify-center desktop:pr-4">
+            <Link href="/" className="inline-flex ">
               <div className="relative h-[96px] w-[78px]">
                 <Image
                   src="/img/logo-green.webp"
                   alt={brand.full}
                   fill
                   sizes="78px"
-                  className="object-contain object-left"
+                  className="object-contain object-center"
                 />
               </div>
             </Link>
@@ -129,50 +129,56 @@ export default function FooterComponent() {
             </div>
           </div>
 
-          <div className="desktop:border-l desktop:border-[rgba(20,72,47,0.16)] desktop:px-8">
+          <div className="desktop:border-l desktop:border-[rgba(20,72,47,0.16)] desktop:pl-8">
             <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[rgba(19,24,20,0.62)]">
               Contact
             </p>
             <div className="mt-3 space-y-2 text-[15px] uppercase tracking-[0.03em]">
               {phoneInfo?.href ? (
-                <a href={phoneInfo.href} className="block transition hover:text-[var(--site-orange)]">
+                <a
+                  href={phoneInfo.href}
+                  className="block transition hover:text-[var(--site-orange)]"
+                >
                   {phoneInfo.value}
                 </a>
               ) : (
                 <p>{phoneInfo?.value || "-"}</p>
               )}
               {emailInfo?.href ? (
-                <a href={emailInfo.href} className="block break-all transition hover:text-[var(--site-orange)]">
+                <a
+                  href={emailInfo.href}
+                  className="block break-words transition hover:text-[var(--site-orange)]"
+                >
                   {emailInfo.value}
                 </a>
               ) : (
                 <p>{emailInfo?.value || "-"}</p>
               )}
             </div>
-          </div>
 
-          <div className="desktop:border-l desktop:border-[rgba(20,72,47,0.16)] desktop:pl-8">
-            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[rgba(19,24,20,0.62)]">
-              Suivez-nous
-            </p>
             {primarySocialLinks.length ? (
-              <div className="mt-4 flex flex-wrap gap-3">
-                {primarySocialLinks.map((item) => {
-                  const Icon = iconByPlatform[item.icon] || Music2;
+              <div className="mt-6">
+                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[rgba(19,24,20,0.62)]">
+                  Suivez-nous
+                </p>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  {primarySocialLinks.map((item) => {
+                    const Icon = iconByPlatform[item.icon] || Music2;
 
-                  return (
-                    <a
-                      key={item.label}
-                      href={item.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label={item.label}
-                      className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--site-orange)] text-white transition hover:translate-y-[-1px] hover:bg-[var(--site-orange-deep)]"
-                    >
-                      <Icon size={18} strokeWidth={2} />
-                    </a>
-                  );
-                })}
+                    return (
+                      <a
+                        key={item.label}
+                        href={item.href}
+                        target="_blank"
+                        rel="noreferrer"
+                        aria-label={item.label}
+                        className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--site-orange)] text-white transition hover:translate-y-[-1px] hover:bg-[var(--site-orange-deep)]"
+                      >
+                        <Icon size={18} strokeWidth={2} />
+                      </a>
+                    );
+                  })}
+                </div>
               </div>
             ) : null}
           </div>

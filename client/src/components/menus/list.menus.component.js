@@ -440,7 +440,7 @@ export default function ListMenusComponent({ restaurantData }) {
                 <MediaCard image={firstCategory.image} />
               </RevealOnScrollComponent>
 
-              <div className="relative self-start desktop:sticky desktop:top-[104px]">
+              <div className="relative hidden self-start desktop:block desktop:sticky desktop:top-[104px]">
                 <RevealOnScrollComponent variant="up">
                   <MenusPanel
                     menus={visibleMenus}
@@ -481,6 +481,15 @@ export default function ListMenusComponent({ restaurantData }) {
               </div>
             );
           })}
+
+          <div className="desktop:hidden">
+            <RevealOnScrollComponent variant="up">
+              <MenusPanel
+                menus={visibleMenus}
+                menuCategories={visibleMenuCategories}
+              />
+            </RevealOnScrollComponent>
+          </div>
 
           <div className="grid items-stretch gap-6 desktop:grid-cols-[0.72fr_1.28fr]">
             <RevealOnScrollComponent variant="up" className="h-full">

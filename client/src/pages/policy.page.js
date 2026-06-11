@@ -1,12 +1,12 @@
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import NavComponent from "@/components/_shared/nav/nav.component";
 import FooterComponent from "@/components/_shared/footer/footer.component";
-import BannerComponent from "@/components/_shared/banner/banner.component";
 import SeoHeadComponent from "@/components/_shared/seo/seo-head.component";
 import SectionHeadingComponent from "@/components/_shared/section-heading.component";
-import RevealOnScrollComponent from "@/components/_shared/motion/reveal-on-scroll.component";
 import GraphicElementComponent from "@/components/_shared/graphic-element.component";
+import RevealOnScrollComponent from "@/components/_shared/motion/reveal-on-scroll.component";
 import { buildStaticPageProps } from "@/_assets/utils/page-props.utils";
 
 function PolicySection({ title, children, last = false }) {
@@ -68,13 +68,61 @@ export default function PolicyPage({ seoRestaurantData = null }) {
 
         <NavComponent isVisible={showScrolledNav} scrolled={true} />
 
-        <div ref={heroRef}>
-          <BannerComponent
-            eyebrow="Données"
-            title="Politique de confidentialité"
-            description="Cette page résume les données pouvant être traitées via le site, leurs finalités et les droits associés."
-            imgUrl="home/art.webp"
-          />
+        <div
+          ref={heroRef}
+          className="relative min-h-[90svh] overflow-hidden bg-[url('/img/home/art.webp')] bg-cover bg-center text-[var(--site-cream)]"
+        >
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(5,8,7,0.86)_0%,rgba(5,8,7,0.54)_44%,rgba(5,8,7,0.24)_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,8,7,0.14)_0%,rgba(5,8,7,0.48)_100%)]" />
+
+          <div className="relative mx-auto flex min-h-[90svh] w-full max-w-[1720px] items-end px-5 pb-24 pt-[150px] tablet:px-8 tablet:pb-28 desktop:px-12 desktop:pb-32">
+            <div className="grid w-full gap-10 desktop:grid-cols-[1fr_0.95fr] desktop:items-end">
+              <div className="max-w-[860px]">
+                <RevealOnScrollComponent
+                  as="h1"
+                  className="yeseva-one-regular text-[64px] uppercase leading-[0.92] tracking-[-0.04em] text-white tablet:text-[92px] desktop:text-[110px]"
+                >
+                  Politique de
+                  <br />
+                  confidentialité
+                </RevealOnScrollComponent>
+
+                <RevealOnScrollComponent
+                  as="p"
+                  delay={80}
+                  className="kalam-font mt-10 text-[30px] leading-[1.15] text-white tablet:text-[40px] desktop:text-[48px]"
+                >
+                  Données,{" "}
+                  <span className="text-[var(--site-orange)]">transparence & droits.</span>
+                </RevealOnScrollComponent>
+
+                <RevealOnScrollComponent
+                  delay={160}
+                  className="mt-8 max-w-[620px] space-y-1.5 text-[23px] leading-[1.45] text-white tablet:text-[28px]"
+                >
+                  <p>Cette page résume les données pouvant être</p>
+                  <p>traitées via le site, leurs finalités</p>
+                  <p>et les droits associés.</p>
+                </RevealOnScrollComponent>
+              </div>
+
+              <RevealOnScrollComponent
+                delay={180}
+                variant="zoom"
+                className="relative hidden min-h-[520px] desktop:block"
+              >
+                <div className="absolute bottom-[70px] right-[4%] h-[290px] w-[290px]">
+                  <Image
+                    src="/img/_shared/badge.webp"
+                    alt="Les jeudis qui jacassent"
+                    fill
+                    sizes="290px"
+                    className="object-contain drop-shadow-[0_18px_30px_rgba(0,0,0,0.28)]"
+                  />
+                </div>
+              </RevealOnScrollComponent>
+            </div>
+          </div>
         </div>
 
         <section className="relative overflow-hidden bg-[var(--site-cream)] px-5 py-20 tablet:px-8 tablet:py-24 desktop:px-[90px] desktop:py-[110px]">
@@ -98,11 +146,7 @@ export default function PolicyPage({ seoRestaurantData = null }) {
               description="Les traitements décrits ci-dessous correspondent aux fonctionnalités visibles sur le site à ce jour."
             />
 
-            <RevealOnScrollComponent
-              delay={120}
-              variant="soft"
-              className="site-card mx-auto mt-14 max-w-[980px] rounded-[34px] p-6 tablet:p-8 desktop:p-12"
-            >
+            <div className="site-card mx-auto mt-14 max-w-[980px] rounded-[34px] p-6 tablet:p-8 desktop:p-12">
               <div className="mt-8">
                 <PolicySection title="Responsable du traitement">
                   <p>
@@ -263,7 +307,7 @@ export default function PolicyPage({ seoRestaurantData = null }) {
                   </p>
                 </PolicySection>
               </div>
-            </RevealOnScrollComponent>
+            </div>
           </div>
         </section>
 

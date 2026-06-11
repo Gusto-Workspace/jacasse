@@ -1,11 +1,23 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { format } from "date-fns";
 import { useRouter } from "next/router";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import { Loader2, ChevronDown } from "lucide-react";
+import {
+  Loader2,
+  ChevronDown,
+  CalendarDays,
+  Clock3,
+  Users,
+  User,
+  Phone,
+  Mail,
+  PencilLine,
+  Check,
+} from "lucide-react";
+import Image from "next/image";
 import RevealOnScrollComponent from "../_shared/motion/reveal-on-scroll.component";
-import SectionHeadingComponent from "../_shared/section-heading.component";
+import ReservationCtaComponent from "../_shared/reservation-cta/reservation-cta.component";
 import {
   formatReservationDateForApi,
   getAvailableReservationTimes,
@@ -64,6 +76,8 @@ export default function FormReservationComponent({
     useState(false);
   const [isCancelingPendingBankHold, setIsCancelingPendingBankHold] =
     useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
+  const datePickerRef = useRef(null);
   const fetchReservationsList = useCallback(async () => {
     if (!apiBaseUrl || !restaurant?._id) {
       setReservationsList([]);
@@ -286,6 +300,29 @@ export default function FormReservationComponent({
     reservationData.reservationDate,
     reservationData.reservationTime,
   ]);
+  useEffect(() => {
+    if (!showCalendar) {
+      return undefined;
+    }
+
+    function handlePointerDown(event) {
+      if (!datePickerRef.current) {
+        return;
+      }
+
+      if (!datePickerRef.current.contains(event.target)) {
+        setShowCalendar(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+    };
+  }, [showCalendar]);
   function formatTimeDisplay(time) {
     const [h, m] = time.split(":");
     return `${h}h${m}`;
@@ -317,6 +354,7 @@ export default function FormReservationComponent({
   function handleDateChange(d) {
     setError(null);
     setSuccessMessage("");
+    setShowCalendar(false);
     setReservationData((prev) => ({
       ...prev,
       reservationDate: d,
@@ -499,6 +537,10 @@ export default function FormReservationComponent({
     (option) => option.time === reservationData.reservationTime,
   );
   const isWaitlistSelection = selectedTimeOption?.type === "waitlist";
+  const formattedDateLabel = format(
+    reservationData.reservationDate,
+    "dd/MM/yyyy",
+  );
   return (
     <>
       {showPendingBankHoldModal && pendingBankHoldReservation && (
@@ -564,205 +606,147 @@ export default function FormReservationComponent({
           </div>
         </div>
       )}
-      <section className="site-shell px-5 py-20 tablet:px-8 tablet:py-24 desktop:px-[90px] desktop:py-[110px]">
+      <section className="site-shell px-5 py-16 tablet:px-8 tablet:py-20 desktop:px-[44px] desktop:py-24">
         <div className="mx-auto max-w-[1500px]">
-          <SectionHeadingComponent
-            eyebrow="Réservation"
-            title="Préparez votre venue"
-            description="Choisissez votre date, votre horaire et renseignez vos informations pour finaliser votre réservation."
-          />
+          <RevealOnScrollComponent className="flex items-center justify-center gap-3 text-center">
+            <div className="relative h-6 w-10 rotate-[215deg]">
+              <Image
+                src="/img/_shared/ornement.webp"
+                alt=""
+                fill
+                sizes="40px"
+                className="object-contain"
+              />
+            </div>
+            <h2 className="yeseva-one-regular text-[42px] uppercase leading-[0.95] text-[var(--site-ink)] tablet:text-[54px] desktop:text-[62px]">
+              Réservation en ligne
+            </h2>
+            <div className="relative h-6 w-10 rotate-[30deg]">
+              <Image
+                src="/img/_shared/ornement.webp"
+                alt=""
+                fill
+                sizes="40px"
+                className="object-contain"
+              />
+            </div>
+          </RevealOnScrollComponent>
+
+          <p className="mx-auto mt-5 max-w-[620px] text-center text-[22px] leading-[1.6] text-[var(--site-ink-soft)] tablet:text-[26px]">
+            Remplissez le formulaire ci-dessous,
+            <br />
+            nous vous confirmerons votre réservation.
+          </p>
 
           <div className="mx-auto mt-14 max-w-[1380px]">
             {!dataLoading ? (
-              <form onSubmit={handleSubmit} className="flex flex-col gap-8">
-                <RevealOnScrollComponent
-                  variant="left"
-                  className="site-card rounded-[30px] p-5 tablet:max-w-[360px] tablet:p-6"
-                >
-                  <label className="mb-3 block text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--site-orange-deep)] tablet:text-[12px] tablet:tracking-[0.32em]">
-                    Personnes
-                  </label>
-                  <div className="relative">
-                    <select
+              <form onSubmit={handleSubmit} className="flex flex-col gap-5 tablet:gap-6">
+                <div className="grid overflow-visible gap-5 tablet:grid-cols-2 tablet:gap-6">
+                  <div ref={datePickerRef} className="relative z-30">
+                    <RevealOnScrollComponent variant="left">
+                      <button
+                        type="button"
+                        onClick={() => setShowCalendar((prev) => !prev)}
+                        className={`flex h-[90.5px] w-full items-center justify-between rounded-[10px] border bg-white px-5 py-4 text-left shadow-[0_12px_30px_rgba(19,24,20,0.06)] transition ${
+                          invalidFields.reservationDate
+                            ? "border-[#c55050]"
+                            : "border-[rgba(20,72,47,0.18)]"
+                        }`}
+                      >
+                        <div>
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--site-ink)]">
+                            Date
+                          </p>
+                          <p className="mt-1 text-[18px] text-[var(--site-ink-soft)] tablet:text-[20px]">
+                            {formattedDateLabel}
+                          </p>
+                        </div>
+                        <CalendarDays size={24} strokeWidth={1.8} className="text-[var(--site-ink)]" />
+                      </button>
+                    </RevealOnScrollComponent>
+
+                    {showCalendar ? (
+                      <div className="absolute left-0 top-[calc(100%+12px)] z-[80] w-full rounded-[16px] border border-[rgba(20,72,47,0.14)] bg-white px-4 pb-4 pt-8 shadow-[0_24px_60px_rgba(19,24,20,0.14)]">
+                        <div className="reservation-calendar-wrapper overflow-visible">
+                          <Calendar
+                            onChange={handleDateChange}
+                            value={reservationData.reservationDate}
+                            view="month"
+                            locale="fr-FR"
+                            tileDisabled={disableClosedDays}
+                            minDate={new Date()}
+                            className="reservation-calendar w-full border-none bg-transparent"
+                          />
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+
+                  <RevealOnScrollComponent variant="right">
+                    <div
+                      className={`min-h-[82px] rounded-[10px] border bg-white px-5 py-4 shadow-[0_12px_30px_rgba(19,24,20,0.06)] ${
+                        invalidFields.reservationTime
+                          ? "border-[#c55050]"
+                          : "border-[rgba(20,72,47,0.18)]"
+                      }`}
+                    >
+                      <div className="flex min-h-[52px] items-center justify-between gap-4">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--site-ink)]">
+                            Heure
+                          </p>
+                          <div className="relative mt-2">
+                            <select
+                              name="reservationTime"
+                              value={reservationData.reservationTime}
+                              onChange={handleInputChange}
+                              aria-invalid={invalidFields.reservationTime}
+                              className="h-[32px] w-full appearance-none bg-transparent pr-10 text-[18px] leading-[32px] text-[var(--site-ink-soft)] outline-none tablet:text-[20px]"
+                            >
+                              <option value="">Sélectionnez une heure</option>
+                              {timeOptions.map((option) => (
+                                <option key={option.time} value={option.time}>
+                                  {formatTimeDisplay(option.time)}
+                                  {option.type === "waitlist" ? " • liste d’attente" : ""}
+                                </option>
+                              ))}
+                            </select>
+                            <ChevronDown
+                              size={18}
+                              strokeWidth={1.4}
+                              className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 text-[var(--site-ink-soft)]"
+                            />
+                          </div>
+                        </div>
+                        <Clock3 size={24} strokeWidth={1.8} className="shrink-0 text-[var(--site-ink)]" />
+                      </div>
+                      {isLoading ? (
+                        <p className="mt-2 flex items-center gap-2 text-[13px] text-[var(--site-ink-soft)]">
+                          <Loader2 size={14} className="animate-spin" />
+                          Chargement...
+                        </p>
+                      ) : null}
+                    </div>
+                  </RevealOnScrollComponent>
+
+                  <RevealOnScrollComponent variant="left">
+                    <SelectField
+                      label="Nombre de personnes"
                       name="numberOfGuests"
                       value={reservationData.numberOfGuests}
                       onChange={handleInputChange}
-                      aria-invalid={invalidFields.numberOfGuests}
-                      className={`site-select h-[56px] appearance-none px-4 pr-11 text-[15px] tablet:px-5 tablet:pr-12 tablet:text-[17px] ${invalidFields.numberOfGuests ? "border-[#c55050] bg-[#fff4f1] focus:border-[#c55050]" : ""}`}
+                      invalid={invalidFields.numberOfGuests}
+                      icon={Users}
                     >
                       {peopleOptions.map((value) => (
                         <option key={value} value={value}>
                           {value} {Number(value) > 1 ? "personnes" : "personne"}
                         </option>
                       ))}
-                    </select>
-                    <ChevronDown
-                      size={18}
-                      strokeWidth={1.4}
-                      className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[var(--site-ink-soft)]"
-                    />
-                  </div>
-                </RevealOnScrollComponent>
-
-                <div className="grid gap-6 desktop:grid-cols-[1fr_1fr]">
-                  <RevealOnScrollComponent
-                    variant="left"
-                    className="site-card rounded-[30px] p-5 tablet:p-6 desktop:p-7"
-                  >
-                    <div className="mb-5">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--site-orange-deep)] tablet:text-[12px] tablet:tracking-[0.32em]">
-                        Calendrier
-                      </p>
-                      <h3 className="yeseva-one-regular mt-3 text-[38px] leading-[0.92] text-[var(--site-ink)] tablet:text-[46px]">
-                        Choisissez votre date
-                      </h3>
-                    </div>
-                    <div className="reservation-calendar-wrapper overflow-hidden">
-                      <Calendar
-                        onChange={handleDateChange}
-                        value={reservationData.reservationDate}
-                        view="month"
-                        locale="fr-FR"
-                        tileDisabled={disableClosedDays}
-                        minDate={new Date()}
-                        className="reservation-calendar w-full border-none bg-transparent"
-                      />
-                    </div>
+                    </SelectField>
                   </RevealOnScrollComponent>
 
-                  <RevealOnScrollComponent
-                    delay={120}
-                    variant="right"
-                    className={`site-card relative rounded-[30px] p-5 tablet:p-6 desktop:p-7 ${
-                      invalidFields.reservationTime
-                        ? "border-[#c55050] bg-[#fff4f1]"
-                        : ""
-                    }`}
-                  >
-                    <div className="mb-5 flex items-start justify-between gap-4">
-                      <div>
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--site-orange-deep)] tablet:text-[12px] tablet:tracking-[0.32em]">
-                          Disponibilités
-                        </p>
-                        <h3 className="yeseva-one-regular mt-3 text-[38px] leading-[0.92] text-[var(--site-ink)] tablet:text-[46px]">
-                          Sélectionnez un horaire
-                        </h3>
-                      </div>
-                      {isLoading && (
-                        <div className="absolute left-1/2 top-[80%] flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 text-[13px] text-[var(--site-ink-soft)] tablet:top-1/2 tablet:text-[14px]">
-                          <Loader2 size={16} className="animate-spin" />
-                          Chargement...
-                        </div>
-                      )}
-                    </div>
-                    {!isLoading && timeOptions.length > 0 ? (
-                      <div className="grid grid-cols-2 gap-3 tablet:grid-cols-3 desktop:grid-cols-4">
-                        {timeOptions.map((option) => {
-                          const time = option.time;
-                          const isActive =
-                            reservationData.reservationTime === time;
-                          const isWaitlist = option.type === "waitlist";
-                          return (
-                            <button
-                              key={time}
-                              type="button"
-                              onClick={() => {
-                                setError(null);
-                                setSuccessMessage("");
-                                setInvalidFields((prev) => {
-                                  if (!prev.reservationTime) return prev;
-
-                                  const nextInvalidFields = { ...prev };
-                                  delete nextInvalidFields.reservationTime;
-                                  return nextInvalidFields;
-                                });
-                                setReservationData((prev) => ({
-                                  ...prev,
-                                  reservationTime: time,
-                                }));
-                              }}
-                              disabled={!reservationData.numberOfGuests}
-                              aria-label={
-                                isWaitlist
-                                  ? `${formatTimeDisplay(time)} complet, liste d’attente`
-                                  : formatTimeDisplay(time)
-                              }
-                              className={`min-w-0 rounded-[14px] border px-3 py-3 text-[14px] transition tablet:px-4 tablet:text-[15px] ${
-                                isActive
-                                  ? "border-[var(--site-orange)] bg-[var(--site-orange)] text-white"
-                                  : isWaitlist
-                                    ? "border-dashed border-[var(--site-orange)]/70 bg-white/70 text-[var(--site-orange-deep)]"
-                                    : "border-[var(--site-line)] bg-white/90 text-[var(--site-ink)] hover:border-[var(--site-orange)] hover:text-[var(--site-orange-deep)]"
-                              }`}
-                            >
-                              {formatTimeDisplay(time)}
-                              {isWaitlist ? (
-                                <span className="mt-1 block text-[10px] uppercase tracking-[0.12em]">
-                                  Complet
-                                </span>
-                              ) : null}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    ) : (
-                      !isLoading && (
-                        <p className="text-[15px] leading-[1.8] text-[var(--site-ink-soft)] tablet:text-[17px]">
-                          Aucun créneau disponible pour cette date.
-                        </p>
-                      )
-                    )}
-                    {isWaitlistSelection ? (
-                      <p className="mt-4 text-[14px] leading-[1.7] text-[var(--site-ink-soft)] tablet:text-[15px]">
-                        Ce créneau est complet. Vous pouvez vous inscrire en
-                        liste d’attente et nous vous préviendrons si une place
-                        se libère.
-                      </p>
-                    ) : null}
-                  </RevealOnScrollComponent>
-                </div>
-
-                <RevealOnScrollComponent
-                  delay={180}
-                  variant="up"
-                  className="site-card rounded-[30px] p-5 tablet:p-6 desktop:p-7"
-                >
-                  <div className="mb-7 tablet:mb-8">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--site-orange-deep)] tablet:text-[12px] tablet:tracking-[0.32em]">
-                      Vos informations
-                    </p>
-                    <h3 className="yeseva-one-regular mt-3 text-[38px] leading-[0.92] text-[var(--site-ink)] tablet:text-[46px]">
-                      Finalisez la réservation
-                    </h3>
-                  </div>
-                  <div className="grid gap-5 tablet:grid-cols-2">
-                    <Field
-                      label="Prénom*"
-                      fieldId="reservation-customer-first-name"
-                      name="customerFirstName"
-                      value={reservationData.customerFirstName}
-                      onChange={handleInputChange}
-                      type="text"
-                      invalid={invalidFields.customerFirstName}
-                    />
-                    <Field
-                      label="Nom*"
-                      fieldId="reservation-customer-last-name"
-                      name="customerLastName"
-                      value={reservationData.customerLastName}
-                      onChange={handleInputChange}
-                      type="text"
-                      invalid={invalidFields.customerLastName}
-                    />
-                    <Field
-                      label="Email*"
-                      fieldId="reservation-customer-email"
-                      name="customerEmail"
-                      value={reservationData.customerEmail}
-                      onChange={handleInputChange}
-                      type="email"
-                      invalid={invalidFields.customerEmail}
-                    />
+                  <RevealOnScrollComponent variant="right">
                     <Field
                       label="Téléphone*"
                       fieldId="reservation-customer-phone"
@@ -770,57 +754,130 @@ export default function FormReservationComponent({
                       value={reservationData.customerPhone}
                       onChange={handleInputChange}
                       type="tel"
+                      placeholder="Votre numéro"
                       invalid={invalidFields.customerPhone}
+                      icon={Phone}
                     />
-                    <div className="tablet:col-span-2">
+                  </RevealOnScrollComponent>
+
+                  <RevealOnScrollComponent variant="left">
+                    <Field
+                      label="Prénom*"
+                      fieldId="reservation-customer-first-name"
+                      name="customerFirstName"
+                      value={reservationData.customerFirstName}
+                      onChange={handleInputChange}
+                      placeholder="Votre prénom"
+                      invalid={invalidFields.customerFirstName}
+                      icon={User}
+                    />
+                  </RevealOnScrollComponent>
+
+                  <RevealOnScrollComponent variant="right">
+                    <Field
+                      label="Nom*"
+                      fieldId="reservation-customer-last-name"
+                      name="customerLastName"
+                      value={reservationData.customerLastName}
+                      onChange={handleInputChange}
+                      placeholder="Votre nom"
+                      invalid={invalidFields.customerLastName}
+                      icon={User}
+                    />
+                  </RevealOnScrollComponent>
+
+                  <div className="tablet:col-span-2">
+                    <RevealOnScrollComponent variant="up">
+                      <Field
+                        label="Email*"
+                        fieldId="reservation-customer-email"
+                        name="customerEmail"
+                        value={reservationData.customerEmail}
+                        onChange={handleInputChange}
+                        type="email"
+                        placeholder="Votre email"
+                        invalid={invalidFields.customerEmail}
+                        icon={Mail}
+                      />
+                    </RevealOnScrollComponent>
+                  </div>
+
+                  <div className="tablet:col-span-2">
+                    <RevealOnScrollComponent variant="up">
                       <label
                         htmlFor="reservation-commentary"
-                        className="mb-3 block text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--site-orange-deep)] tablet:text-[12px] tablet:tracking-[0.32em]"
+                        className="block rounded-[10px] border border-[rgba(20,72,47,0.18)] bg-white px-5 py-4 shadow-[0_12px_30px_rgba(19,24,20,0.06)]"
                       >
-                        Commentaire
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="min-w-0 flex-1">
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--site-ink)]">
+                              Demande particulière (optionnelle)
+                            </p>
+                            <textarea
+                              id="reservation-commentary"
+                              name="commentary"
+                              value={reservationData.commentary}
+                              onChange={handleInputChange}
+                              rows={4}
+                              className="mt-2 w-full resize-none border-none bg-transparent text-[18px] text-[var(--site-ink-soft)] outline-none tablet:text-[20px]"
+                              placeholder="Anniversaire, allergie, placement en terrasse..."
+                            />
+                          </div>
+                          <PencilLine
+                            size={22}
+                            strokeWidth={1.8}
+                            className="mt-6 shrink-0 text-[var(--site-ink)]"
+                          />
+                        </div>
                       </label>
-                      <textarea
-                        id="reservation-commentary"
-                        name="commentary"
-                        value={reservationData.commentary}
-                        onChange={handleInputChange}
-                        rows={5}
-                        className="site-textarea w-full resize-none px-4 py-4 text-[15px] text-[var(--site-ink)] tablet:px-5 tablet:text-[16px]"
-                        placeholder="Une demande particulière ?"
-                      />
-                    </div>
+                    </RevealOnScrollComponent>
                   </div>
-                  {error && (
-                    <div className="mt-6 rounded-[18px] border border-red-200 bg-red-50 px-4 py-3 text-[14px] text-red-700 tablet:text-[15px]">
-                      {error}
-                    </div>
-                  )}
-                  {successMessage && (
-                    <div className="mt-6 rounded-[18px] border border-[var(--site-line)] bg-[#edf4e8] px-4 py-3 text-[14px] text-[#2f5c1a] tablet:text-[15px]">
-                      {successMessage}
-                    </div>
-                  )}
-                  <div className="mt-8 flex justify-start tablet:justify-end">
-                    <button
-                      type="submit"
-                      disabled={
-                        !isReservationFormComplete || isLoading || isSubmitting
-                      }
-                      className="site-button w-full disabled:cursor-not-allowed disabled:opacity-50 tablet:w-auto tablet:min-w-[220px] tablet:text-[13px] tablet:tracking-[0.28em]"
-                    >
-                      {isSubmitting ? (
-                        <span className="flex items-center gap-2">
-                          <Loader2 size={18} className="animate-spin" />
-                          {isWaitlistSelection ? "Inscription..." : "Envoi..."}
-                        </span>
-                      ) : isWaitlistSelection ? (
-                        "Liste d’attente"
-                      ) : (
-                        "Confirmer"
-                      )}
-                    </button>
+                </div>
+
+                {error ? (
+                  <div className="rounded-[18px] border border-red-200 bg-red-50 px-4 py-3 text-[14px] text-red-700 tablet:text-[15px]">
+                    {error}
                   </div>
-                </RevealOnScrollComponent>
+                ) : null}
+
+                {successMessage ? (
+                  <div className="rounded-[18px] border border-[var(--site-line)] bg-[#edf4e8] px-4 py-3 text-[14px] text-[#2f5c1a] tablet:text-[15px]">
+                    {successMessage}
+                  </div>
+                ) : null}
+
+                {isWaitlistSelection ? (
+                  <p className="text-center text-[15px] leading-[1.7] text-[var(--site-ink-soft)] tablet:text-[16px]">
+                    Ce créneau est complet. Vous pouvez vous inscrire en liste
+                    d’attente et nous vous préviendrons si une place se libère.
+                  </p>
+                ) : null}
+
+                <div className="pt-2 text-center">
+                  <button
+                    type="submit"
+                    disabled={
+                      !isReservationFormComplete || isLoading || isSubmitting
+                    }
+                    className="inline-flex min-h-[64px] min-w-[320px] items-center justify-center bg-[var(--site-orange)] px-10 text-[15px] font-semibold uppercase tracking-[0.12em] text-white transition disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {isSubmitting ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 size={18} className="animate-spin" />
+                        {isWaitlistSelection ? "Inscription..." : "Envoi..."}
+                      </span>
+                    ) : isWaitlistSelection ? (
+                      "Liste d’attente"
+                    ) : (
+                      "Envoyer ma demande"
+                    )}
+                  </button>
+                </div>
+
+                <div className="flex items-center justify-center gap-3 text-[16px] text-[var(--site-ink)]">
+                  <Check size={20} strokeWidth={2.1} className="text-[var(--site-orange)]" />
+                  <p>Vous recevrez un email de confirmation.</p>
+                </div>
               </form>
             ) : (
               <p className="flex h-[320px] w-full items-center justify-center gap-2 text-[var(--site-ink-soft)] tablet:h-[400px]">
@@ -830,6 +887,8 @@ export default function FormReservationComponent({
           </div>
         </div>
       </section>
+
+      <ReservationCtaComponent phone={restaurant?.phone} />
     </>
   );
 }
@@ -842,26 +901,79 @@ function Field({
   type = "text",
   placeholder = "",
   invalid = false,
+  icon: Icon = null,
 }) {
   return (
     <div>
       <label
         htmlFor={fieldId}
-        className="mb-3 block text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--site-orange-deep)] tablet:text-[12px] tablet:tracking-[0.32em]"
+        className={`flex min-h-[82px] items-center justify-between gap-4 rounded-[10px] border bg-white px-5 py-4 shadow-[0_12px_30px_rgba(19,24,20,0.06)] ${
+          invalid ? "border-[#c55050]" : "border-[rgba(20,72,47,0.18)]"
+        }`}
       >
-        {label}
+        <div className="min-w-0 flex-1">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--site-ink)]">
+            {label}
+          </p>
+          <input
+            id={fieldId}
+            type={type}
+            name={name}
+            value={value}
+            onChange={onChange}
+            aria-invalid={invalid}
+            placeholder={placeholder}
+            className="mt-2 h-[32px] w-full border-none bg-transparent text-[18px] text-[var(--site-ink-soft)] outline-none tablet:text-[20px]"
+          />
+        </div>
+        {Icon ? (
+          <Icon size={24} strokeWidth={1.8} className="shrink-0 text-[var(--site-ink)]" />
+        ) : null}
       </label>
-      <input
-        id={fieldId}
-        type={type}
-        name={name}
-        value={value}
-        onChange={onChange}
-        aria-invalid={invalid}
-        placeholder={placeholder}
-        className={`site-input h-[52px] px-4 text-[15px] text-[var(--site-ink)] tablet:h-[56px] tablet:px-5 tablet:text-[16px] ${invalid ? "border-[#c55050] bg-[#fff4f1] focus:border-[#c55050]" : ""}`}
-      />
     </div>
+  );
+}
+
+function SelectField({
+  label,
+  name,
+  value,
+  onChange,
+  invalid = false,
+  icon: Icon = null,
+  children,
+}) {
+  return (
+    <label
+      className={`flex min-h-[82px] items-center justify-between gap-4 rounded-[10px] border bg-white px-5 py-4 shadow-[0_12px_30px_rgba(19,24,20,0.06)] ${
+        invalid ? "border-[#c55050]" : "border-[rgba(20,72,47,0.18)]"
+      }`}
+    >
+      <div className="min-w-0 flex-1">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--site-ink)]">
+          {label}
+        </p>
+        <div className="relative mt-2">
+          <select
+            name={name}
+            value={value}
+            onChange={onChange}
+            aria-invalid={invalid}
+            className="h-[32px] w-full appearance-none bg-transparent pr-10 text-[18px] leading-[32px] text-[var(--site-ink-soft)] outline-none tablet:text-[20px]"
+          >
+            {children}
+          </select>
+          <ChevronDown
+            size={18}
+            strokeWidth={1.4}
+            className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 text-[var(--site-ink-soft)]"
+          />
+        </div>
+      </div>
+      {Icon ? (
+        <Icon size={24} strokeWidth={1.8} className="shrink-0 text-[var(--site-ink)]" />
+      ) : null}
+    </label>
   );
 }
 

@@ -30,7 +30,7 @@ export default function BannerComponent({
   const imageSrc = useMemo(() => normalizeBannerSrc(imgUrl), [imgUrl]);
 
   return (
-    <section className="site-noise relative isolate overflow-hidden px-5 pb-24 pt-32 text-[var(--site-cream)] tablet:px-8 tablet:pb-28 tablet:pt-36 desktop:px-[90px] desktop:pb-32 desktop:pt-40">
+    <section className="site-noise relative isolate min-h-[90svh] overflow-hidden px-5 pb-24 pt-32 text-[var(--site-cream)] tablet:px-8 tablet:pb-28 tablet:pt-36 desktop:px-[90px] desktop:pb-32 desktop:pt-40">
       <div className="absolute inset-0">
         <Image
           src={hasError ? FALLBACK_BANNER : imageSrc}
@@ -45,7 +45,7 @@ export default function BannerComponent({
       <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(11,16,13,0.78),rgba(20,72,47,0.52))]" />
       <div className="absolute inset-0 site-grid-glow opacity-50" />
 
-      <div className="relative mx-auto max-w-[1400px]">
+      <div className="relative mx-auto flex min-h-[calc(90svh-8rem)] max-w-[1400px] flex-col justify-end tablet:min-h-[calc(90svh-9rem)] desktop:min-h-[calc(90svh-10rem)]">
         <RevealOnScrollComponent as="p" className="text-[11px] font-semibold uppercase tracking-[0.3em] text-[rgba(246,241,232,0.72)]">
           {eyebrow}
         </RevealOnScrollComponent>

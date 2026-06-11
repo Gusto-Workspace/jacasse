@@ -1,14 +1,18 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { Menu, X } from "lucide-react";
+import { GlobalContext } from "@/contexts/global.context";
+import { hasVisibleNews } from "@/_assets/utils/news.utils";
 
-const menuItems = [
+const baseMenuItems = [
   { label: "Accueil", href: "/" },
   { label: "Carte & menus", href: "/menus" },
+  { label: "Actualités", href: "/news", visibilityKey: "news" },
   { label: "Contact", href: "/contact" },
 ];
+let hasAssignedInitialNavReveal = false;
 
 function isCurrentPath(routerPath, href) {
   if (href === "/") {
@@ -37,7 +41,107 @@ function Brand({ scrolled = false }) {
 
 export default function NavComponent({ isVisible = true, scrolled = false }) {
   const router = useRouter();
+  const { restaurantContext } = useContext(GlobalContext);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [hasStartedNewsVisibilityCheck, setHasStartedNewsVisibilityCheck] =
+    useState(false);
+  const [newsVisibilityResolved, setNewsVisibilityResolved] = useState(false);
+  const [navReady, setNavReady] = useState(false);
+  const [animateOnMount, setAnimateOnMount] = useState(false);
+  const [mountReady, setMountReady] = useState(false);
+  const [visibilityTransitionsEnabled, setVisibilityTransitionsEnabled] =
+    useState(false);
+  const restaurantData = restaurantContext?.restaurantData;
+  const restaurantDataLoading = restaurantContext?.dataLoading;
+
+  const menuItems = useMemo(
+    () =>
+      baseMenuItems.filter((item) => {
+        if (item.visibilityKey === "news") {
+          return newsVisibilityResolved && hasVisibleNews(restaurantData);
+        }
+
+        return true;
+      }),
+    [newsVisibilityResolved, restaurantData],
+  );
+
+  useEffect(() => {
+    if (isVisible && !hasAssignedInitialNavReveal) {
+      hasAssignedInitialNavReveal = true;
+      setAnimateOnMount(true);
+    }
+  }, [isVisible]);
+
+  useEffect(() => {
+    if (restaurantDataLoading || restaurantData) {
+      setHasStartedNewsVisibilityCheck(true);
+    }
+  }, [restaurantData, restaurantDataLoading]);
+
+  useEffect(() => {
+    if (newsVisibilityResolved) {
+      return;
+    }
+
+    if (restaurantData) {
+      const frame = window.requestAnimationFrame(() => {
+        setNewsVisibilityResolved(true);
+        setNavReady(true);
+      });
+
+      return () => window.cancelAnimationFrame(frame);
+    }
+
+    if (hasStartedNewsVisibilityCheck && !restaurantDataLoading) {
+      const frame = window.requestAnimationFrame(() => {
+        setNewsVisibilityResolved(true);
+        setNavReady(true);
+      });
+
+      return () => window.cancelAnimationFrame(frame);
+    }
+
+    const fallback = window.setTimeout(() => {
+      setNewsVisibilityResolved(true);
+      setNavReady(true);
+    }, 500);
+
+    return () => window.clearTimeout(fallback);
+  }, [
+    hasStartedNewsVisibilityCheck,
+    newsVisibilityResolved,
+    restaurantData,
+    restaurantDataLoading,
+  ]);
+
+  useEffect(() => {
+    if (!navReady) {
+      return;
+    }
+
+    let firstFrame = null;
+    let secondFrame = null;
+
+    if (animateOnMount) {
+      setVisibilityTransitionsEnabled(true);
+      firstFrame = window.requestAnimationFrame(() => {
+        secondFrame = window.requestAnimationFrame(() => {
+          setMountReady(true);
+        });
+      });
+    } else {
+      setMountReady(true);
+      firstFrame = window.requestAnimationFrame(() => {
+        setVisibilityTransitionsEnabled(true);
+      });
+    }
+
+    return () => {
+      if (firstFrame) window.cancelAnimationFrame(firstFrame);
+      if (secondFrame) window.cancelAnimationFrame(secondFrame);
+    };
+  }, [animateOnMount, navReady]);
 
   useEffect(() => {
     if (!menuOpen) {
@@ -56,6 +160,7 @@ export default function NavComponent({ isVisible = true, scrolled = false }) {
   const desktopTextClass = scrolled
     ? "text-[var(--site-ink)]"
     : "text-[var(--site-cream)]";
+  const navIsDisplayed = navReady && mountReady && isVisible;
 
   return (
     <>
@@ -114,8 +219,14 @@ export default function NavComponent({ isVisible = true, scrolled = false }) {
       </aside>
 
       <nav
-        className={`fixed left-0 top-0 z-[50] w-full transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-          isVisible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
+        className={`fixed left-0 top-0 z-[50] w-full ${
+          visibilityTransitionsEnabled
+            ? "transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+            : "transition-none"
+        } ${
+          navIsDisplayed
+            ? "translate-y-0 opacity-100"
+            : "-translate-y-full opacity-0"
         } ${
           scrolled
             ? "bg-[rgba(246,241,232,0.95)] shadow-[0_14px_40px_rgba(11,16,13,0.08)] backdrop-blur-xl"
