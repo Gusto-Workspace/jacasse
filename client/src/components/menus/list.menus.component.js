@@ -220,7 +220,7 @@ function MenusPanel({ menus, menuCategories }) {
                       {item.name}
                     </p>
                     {item.price ? (
-                      <span className="shrink-0 text-[18px]">{item.price}</span>
+                      <span className="shrink-0 text-[18px] text-nowrap">{item.price}</span>
                     ) : null}
                   </div>
                   {item.description ? (
@@ -243,12 +243,12 @@ function MenusPanel({ menus, menuCategories }) {
               key={menu?._id || `menu-${index}`}
               className="border-b border-white/18 pb-6 last:border-b-0 last:pb-0"
             >
-              <div className="flex items-end justify-between gap-4">
+              <div className="flex items-center justify-between gap-4">
                 <h3 className="text-[24px] font-medium uppercase tracking-[0.03em]">
                   {getMenuTitle(menu, index)}
                 </h3>
                 {priceLabel ? (
-                  <span className="shrink-0 text-[23px] leading-none">
+                  <span className="shrink-0 text-[23px] leading-none text-nowrap">
                     {priceLabel}
                   </span>
                 ) : null}
@@ -270,7 +270,7 @@ function MenusPanel({ menus, menuCategories }) {
                         {block.title}
                       </p>
                       {block.price ? (
-                        <span className="text-[16px] text-white/86">
+                        <span className="text-[16px] text-white/86 text-nowrap">
                           {block.price}
                         </span>
                       ) : null}
