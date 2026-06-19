@@ -10,8 +10,8 @@ const items = [
   },
   {
     src: "/img/home/unavoidable-2.webp",
-    title: "DOS DE CABILLAUD",
-    text: "Crème d'asperges et huile verte",
+    title: "TATAKI DE THON",
+    text: "Vinaigrette Thaï",
   },
   {
     src: "/img/home/unavoidable-3.webp",
