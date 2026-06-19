@@ -14,6 +14,26 @@ export function getOpeningHours(restaurant) {
     : [];
 }
 
+function getExceptionalOpeningForDate({ reservationDate, parameters }) {
+  const parsedDate = parseReservationDateValue(reservationDate);
+  if (!parsedDate) return null;
+
+  const dateKey = formatReservationDateForApi(parsedDate);
+  const openings = Array.isArray(parameters?.exceptional_openings)
+    ? parameters.exceptional_openings
+    : [];
+
+  const opening = openings.find(
+    (item) => String(item?.date || "").slice(0, 10) === dateKey,
+  );
+
+  if (!opening || !Array.isArray(opening.hours) || opening.hours.length === 0) {
+    return null;
+  }
+
+  return { day: "exceptional", isClosed: false, hours: opening.hours };
+}
+
 export function parseReservationDateValue(value) {
   if (value instanceof Date) {
     if (Number.isNaN(value.getTime())) return null;
@@ -57,6 +77,12 @@ export function getDayHoursForDate({ reservationDate, restaurant }) {
   const openingHours = getOpeningHours(restaurant);
   const selectedDay = parsedDate.getDay();
   const dayIndex = selectedDay === 0 ? 6 : selectedDay - 1;
+  const exceptionalOpening = getExceptionalOpeningForDate({
+    reservationDate: parsedDate,
+    parameters,
+  });
+
+  if (exceptionalOpening) return exceptionalOpening;
 
   return parameters.same_hours_as_restaurant
     ? openingHours[dayIndex]
@@ -295,16 +321,14 @@ export function getAvailableReservationTimes({
   if (!restaurant?._id || !parsedDate) return [];
 
   const parameters = getReservationParameters(restaurant);
-  const openingHours = getOpeningHours(restaurant);
   const tablesCatalog = Array.isArray(parameters.tables)
     ? parameters.tables
     : [];
   const manage = !!parameters.manage_disponibilities;
-  const selectedDay = parsedDate.getDay();
-  const dayIndex = selectedDay === 0 ? 6 : selectedDay - 1;
-  const dayHours = parameters.same_hours_as_restaurant
-    ? openingHours[dayIndex]
-    : parameters.reservation_hours?.[dayIndex];
+  const dayHours = getDayHoursForDate({
+    reservationDate: parsedDate,
+    restaurant,
+  });
 
   if (
     !dayHours ||
