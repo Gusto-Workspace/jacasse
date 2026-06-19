@@ -11,7 +11,7 @@ const items = [
   {
     src: "/img/home/unavoidable-2.webp",
     title: "TATAKI DE THON",
-    text: "Vinaigrette Thaï",
+    text: "Et sa vinaigrette Thaï",
   },
   {
     src: "/img/home/unavoidable-3.webp",
