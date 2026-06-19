@@ -1,13 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useContext } from "react";
-import {
-  Facebook,
-  Instagram,
-  Linkedin,
-  Music2,
-  Youtube,
-} from "lucide-react";
+import { Facebook, Instagram, Linkedin, Music2, Youtube } from "lucide-react";
 import { GlobalContext } from "@/contexts/global.context";
 import {
   getRestaurantBrandParts,
@@ -93,8 +87,7 @@ export default function FooterComponent() {
 
           <div className="desktop:border-l desktop:border-[rgba(20,72,47,0.16)] desktop:px-8">
             <p className="kalam-font max-w-[220px] text-[30px] leading-[1.24] text-[var(--site-ink)]">
-              Tapas, vins & bons
-              moments à Montauban.
+              Tapas, vins & bons moments à Montauban.
             </p>
           </div>
 
@@ -187,11 +180,22 @@ export default function FooterComponent() {
 
       <div className="bg-[var(--site-orange-deep)] text-white">
         <div className="mx-auto flex max-w-[1730px] flex-col gap-4 px-5 py-5 text-[12px] font-medium uppercase tracking-[0.14em] tablet:px-8 desktop:flex-row desktop:items-center desktop:justify-between desktop:px-[44px]">
-          <p>© Jacasse - Tous droits réservés</p>
-          <div className="flex flex-col gap-3 desktop:flex-row desktop:items-center desktop:gap-12">
+          <div className="flex flex-col desktop:flex-row gap-2">
+            <p>© {new Date().getFullYear()} Jacasse</p>•
+            <p>Tous droits réservés</p>•
+            <a
+              href="https://gusto-manager.com"
+              target="_blank"
+              rel="noreferrer"
+              className="transition hover:text-white underline underline-offset-4"
+            >
+              Propulsé par Gusto Manager
+            </a>
+          </div>
+          <div className="flex flex-col gap-3 desktop:flex-row desktop:items-center desktop:gap-2">
             <Link href="/legales" className="transition hover:text-white/72">
               Mentions légales
-            </Link>
+            </Link>•
             <Link href="/policy" className="transition hover:text-white/72">
               Politique de confidentialité
             </Link>
