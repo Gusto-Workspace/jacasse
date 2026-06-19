@@ -701,7 +701,7 @@ export default function FormReservationComponent({
                               value={reservationData.reservationTime}
                               onChange={handleInputChange}
                               aria-invalid={invalidFields.reservationTime}
-                              className="h-[32px] w-full appearance-none bg-transparent pr-10 text-[18px] leading-[32px] text-[var(--site-ink-soft)] outline-none tablet:text-[20px]"
+                              className="h-[32px] w-full appearance-none bg-white pr-10 text-[18px] leading-[32px] text-[var(--site-ink-soft)] outline-none tablet:text-[20px]"
                             >
                               <option value="">Sélectionnez une heure</option>
                               {timeOptions.map((option) => (
@@ -959,7 +959,7 @@ function SelectField({
             value={value}
             onChange={onChange}
             aria-invalid={invalid}
-            className="h-[32px] w-full appearance-none bg-transparent pr-10 text-[18px] leading-[32px] text-[var(--site-ink-soft)] outline-none tablet:text-[20px]"
+            className="h-[32px] w-full appearance-none bg-white pr-10 text-[18px] leading-[32px] text-[var(--site-ink-soft)] outline-none tablet:text-[20px]"
           >
             {children}
           </select>
