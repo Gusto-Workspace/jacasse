@@ -693,6 +693,23 @@ export default function FormReservationComponent({
                   </div>
 
                   <RevealOnScrollComponent variant="right">
+                    <SelectField
+                      label="Nombre de personnes"
+                      name="numberOfGuests"
+                      value={reservationData.numberOfGuests}
+                      onChange={handleInputChange}
+                      invalid={invalidFields.numberOfGuests}
+                      icon={Users}
+                    >
+                      {peopleOptions.map((value) => (
+                        <option key={value} value={value}>
+                          {value} {Number(value) > 1 ? "personnes" : "personne"}
+                        </option>
+                      ))}
+                    </SelectField>
+                  </RevealOnScrollComponent>
+
+                  <RevealOnScrollComponent variant="left">
                     <div
                       className={`min-h-[82px] rounded-[10px] border bg-white px-5 py-4 shadow-[0_12px_30px_rgba(19,24,20,0.06)] ${
                         invalidFields.reservationTime
@@ -737,23 +754,6 @@ export default function FormReservationComponent({
                         </p>
                       ) : null}
                     </div>
-                  </RevealOnScrollComponent>
-
-                  <RevealOnScrollComponent variant="left">
-                    <SelectField
-                      label="Nombre de personnes"
-                      name="numberOfGuests"
-                      value={reservationData.numberOfGuests}
-                      onChange={handleInputChange}
-                      invalid={invalidFields.numberOfGuests}
-                      icon={Users}
-                    >
-                      {peopleOptions.map((value) => (
-                        <option key={value} value={value}>
-                          {value} {Number(value) > 1 ? "personnes" : "personne"}
-                        </option>
-                      ))}
-                    </SelectField>
                   </RevealOnScrollComponent>
 
                   <RevealOnScrollComponent variant="right">
