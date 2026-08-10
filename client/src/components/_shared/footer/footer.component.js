@@ -106,7 +106,7 @@ export default function FooterComponent() {
             </p>
             <div className="mt-3 space-y-3">
               {scheduleGroups.length ? (
-                scheduleGroups.slice(0, 3).map((group) => (
+                scheduleGroups.map((group) => (
                   <div key={`${group.days[0]}-${group.hours}`}>
                     <p className="text-[13px] font-semibold uppercase tracking-[0.08em]">
                       {formatDayRange(group.days)}

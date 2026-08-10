@@ -33,6 +33,20 @@ function formatDayRange(days) {
   return days.length === 1 ? days[0] : `${days[0]} - ${days[days.length - 1]}`;
 }
 
+function ScheduleHours({ hours }) {
+  const ranges = String(hours || "").split(" • ");
+
+  return (
+    <p className="flex flex-wrap justify-end gap-x-1.5 text-right">
+      {ranges.map((range, index) => (
+        <span key={`${range}-${index}`} className="whitespace-nowrap">
+          {index > 0 ? `• ${range}` : range}
+        </span>
+      ))}
+    </p>
+  );
+}
+
 const itemDecorations = {
   address: "En plein coeur de Montauban.",
   phone: "On vous répond avec plaisir !",
@@ -118,7 +132,7 @@ export default function HighlightsContactComponent() {
                     className="grid grid-cols-[1fr_auto] gap-x-6 text-[16px] leading-[1.45] text-[var(--site-ink)]"
                   >
                     <p>{formatDayRange(group.days)}</p>
-                    <p className="text-right whitespace-pre-line">{group.hours}</p>
+                    <ScheduleHours hours={group.hours} />
                   </div>
                 ))
               ) : (
