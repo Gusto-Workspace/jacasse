@@ -69,6 +69,14 @@ function buildOrderedCategories(categories) {
 }
 
 function MenuLine({ item }) {
+  if (item.isSubCategoryHeading) {
+    return (
+      <h3 className="border-b border-[rgba(20,72,47,0.2)] pb-3 pt-7 text-[15px] font-semibold uppercase tracking-[0.18em] text-[var(--site-orange-deep)] first:pt-3">
+        {item.name}
+      </h3>
+    );
+  }
+
   return (
     <div className="border-b border-[rgba(20,72,47,0.16)] py-4 last:border-b-0">
       <div className="flex items-start gap-4">
@@ -90,8 +98,23 @@ function MenuLine({ item }) {
   );
 }
 
+function getCategoryEntries(category) {
+  return [
+    ...(category?.items || []),
+    ...(category?.subCategories || []).flatMap((subCategory) => [
+      {
+        id: `subcategory-${subCategory.id}`,
+        name: subCategory.title,
+        isSubCategoryHeading: true,
+      },
+      ...subCategory.items,
+    ]),
+  ];
+}
+
 function CategoryList({ category }) {
-  if (!category?.items?.length) {
+  const entries = getCategoryEntries(category);
+  if (!entries.length) {
     return null;
   }
 
@@ -117,7 +140,7 @@ function CategoryList({ category }) {
       ) : null}
 
       <div className="border-t border-[rgba(20,72,47,0.2)]">
-        {category.items.map((item) => (
+        {entries.map((item) => (
           <MenuLine key={item.id} item={item} />
         ))}
       </div>
@@ -210,26 +233,37 @@ function MenusPanel({ menus, menuCategories }) {
               </p>
             ) : null}
             <div className="mt-4 space-y-4">
-              {category.items.map((item) => (
-                <div
-                  key={item.id}
-                  className="border-t border-white/12 pt-4 first:border-t-0 first:pt-0"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <p className="text-[16px] font-semibold uppercase leading-[1.25]">
-                      {item.name}
-                    </p>
-                    {item.price ? (
-                      <span className="shrink-0 text-[18px] text-nowrap">{item.price}</span>
+              {getCategoryEntries(category).map((item) =>
+                item.isSubCategoryHeading ? (
+                  <h4
+                    key={item.id}
+                    className="border-t border-white/18 pt-5 text-[13px] font-semibold uppercase tracking-[0.18em] text-white/72"
+                  >
+                    {item.name}
+                  </h4>
+                ) : (
+                  <div
+                    key={item.id}
+                    className="border-t border-white/12 pt-4 first:border-t-0 first:pt-0"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <p className="text-[16px] font-semibold uppercase leading-[1.25]">
+                        {item.name}
+                      </p>
+                      {item.price ? (
+                        <span className="shrink-0 text-[18px] text-nowrap">
+                          {item.price}
+                        </span>
+                      ) : null}
+                    </div>
+                    {item.description ? (
+                      <p className="mt-1 text-[14px] leading-[1.45] text-white/74">
+                        {item.description}
+                      </p>
                     ) : null}
                   </div>
-                  {item.description ? (
-                    <p className="mt-1 text-[14px] leading-[1.45] text-white/74">
-                      {item.description}
-                    </p>
-                  ) : null}
-                </div>
-              ))}
+                ),
+              )}
             </div>
           </div>
         ))}
@@ -365,8 +399,6 @@ function CocktailSignatureCard() {
               </p>
             </div>
           </div>
-
-          
         </div>
       </div>
     </div>
@@ -384,23 +416,22 @@ function CategoryBand({ categories }) {
         <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-3 desktop:gap-x-6">
           {categories.map((category, index) => (
             <div key={category.anchorId} className="contents">
-            <a
-              href={`#${category.anchorId}`}
-              className={`inline-flex min-h-[38px] items-center justify-center px-5 text-[12px] font-semibold uppercase tracking-[0.22em] transition ${
-                index === 0
-                  ? "rounded-full bg-[var(--site-orange)] text-white shadow-[0_10px_24px_rgba(20,72,47,0.18)]"
-                  : "text-[var(--site-ink)] hover:text-[var(--site-orange)]"
-              }`}
-            >
-              {category.title}
-             
-            </a>
-             {index < categories.length - 1 ? (
+              <a
+                href={`#${category.anchorId}`}
+                className={`inline-flex min-h-[38px] items-center justify-center px-5 text-[12px] font-semibold uppercase tracking-[0.22em] transition ${
+                  index === 0
+                    ? "rounded-full bg-[var(--site-orange)] text-white shadow-[0_10px_24px_rgba(20,72,47,0.18)]"
+                    : "text-[var(--site-ink)] hover:text-[var(--site-orange)]"
+                }`}
+              >
+                {category.title}
+              </a>
+              {index < categories.length - 1 ? (
                 <span className="hidden text-[rgba(20,72,47,0.22)] desktop:inline">
                   •
                 </span>
               ) : null}
-              </div>
+            </div>
           ))}
         </div>
       </div>
