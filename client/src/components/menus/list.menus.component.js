@@ -71,14 +71,20 @@ function buildOrderedCategories(categories) {
 function MenuLine({ item }) {
   if (item.isSubCategoryHeading) {
     return (
-      <h3 className="border-b border-[rgba(20,72,47,0.2)] pb-3 pt-7 text-[15px] font-semibold uppercase tracking-[0.18em] text-[var(--site-orange-deep)] first:pt-3">
+      <h3
+        className="border-b border-[rgba(20,72,47,0.2)] pb-3 pt-7 text-[15px] font-semibold uppercase tracking-[0.18em] text-[var(--site-orange-deep)] first:pt-3"
+        data-print-subcategory-title
+      >
         {item.name}
       </h3>
     );
   }
 
   return (
-    <div className="border-b border-[rgba(20,72,47,0.16)] py-4 last:border-b-0">
+    <div
+      className="border-b border-[rgba(20,72,47,0.16)] py-4 last:border-b-0"
+      data-print-dish
+    >
       <div className="flex items-start gap-4">
         <h4 className="min-w-0 flex-1 text-[17px] font-extrabold uppercase leading-[1.18] tracking-[0.02em] text-[var(--site-ink)] tablet:text-[18px]">
           {item.name}
@@ -112,38 +118,83 @@ function getCategoryEntries(category) {
   ];
 }
 
+function getFirstChunkEndIndex(entries) {
+  let dishCount = 0;
+
+  for (let index = 0; index < entries.length; index += 1) {
+    if (!entries[index].isSubCategoryHeading) dishCount += 1;
+    if (dishCount === 2) return index + 1;
+  }
+
+  return entries.length;
+}
+
+function MenuLines({ entries }) {
+  const content = [];
+
+  for (let index = 0; index < entries.length; index += 1) {
+    const item = entries[index];
+
+    if (item.isSubCategoryHeading) {
+      const firstItem = entries[index + 1];
+      const hasFirstItem = firstItem && !firstItem.isSubCategoryHeading;
+
+      content.push(
+        <div key={item.id} data-print-subcategory-first-chunk>
+          <MenuLine item={item} />
+          {hasFirstItem ? <MenuLine item={firstItem} /> : null}
+        </div>,
+      );
+      if (hasFirstItem) index += 1;
+    } else {
+      content.push(<MenuLine key={item.id} item={item} />);
+    }
+  }
+
+  return content;
+}
+
 function CategoryList({ category }) {
   const entries = getCategoryEntries(category);
   if (!entries.length) {
     return null;
   }
+  const firstChunkEndIndex = getFirstChunkEndIndex(entries);
+  const firstEntries = entries.slice(0, firstChunkEndIndex);
+  const remainingEntries = entries.slice(firstChunkEndIndex);
 
   return (
     <div id={category.anchorId} className="scroll-mt-[130px]">
-      <div className="mb-8 flex items-center gap-4">
-        <h2 className="yeseva-one-regular text-[44px] uppercase leading-[0.94] tracking-[-0.04em] text-[var(--site-orange-deep)] tablet:text-[58px]">
-          {category.title}
-        </h2>
-        <Image
-          src="/img/_shared/ornement.webp"
-          alt=""
-          width={46}
-          height={22}
-          className="h-auto w-[42px] object-contain"
-        />
-      </div>
+      <div data-print-category-first-chunk>
+        <div className="mb-8 flex items-center gap-4">
+          <h2
+            data-print-category-title
+            className="yeseva-one-regular text-[44px] uppercase leading-[0.94] tracking-[-0.04em] text-[var(--site-orange-deep)] tablet:text-[58px]"
+          >
+            {category.title}
+          </h2>
+          <Image
+            src="/img/_shared/ornement.webp"
+            alt=""
+            width={46}
+            height={22}
+            className="h-auto w-[42px] object-contain"
+          />
+        </div>
 
-      {category.description ? (
-        <p className="mb-6 max-w-[680px] text-[16px] leading-[1.6] text-[rgba(19,24,20,0.64)]">
-          {category.description}
-        </p>
+        {category.description ? (
+          <p className="mb-6 max-w-[680px] text-[16px] leading-[1.6] text-[rgba(19,24,20,0.64)]">
+            {category.description}
+          </p>
+        ) : null}
+
+        <div className="border-t border-[rgba(20,72,47,0.2)]">
+          <MenuLines entries={firstEntries} />
+        </div>
+      </div>
+      {remainingEntries.length ? (
+        <MenuLines entries={remainingEntries} />
       ) : null}
-
-      <div className="border-t border-[rgba(20,72,47,0.2)]">
-        {entries.map((item) => (
-          <MenuLine key={item.id} item={item} />
-        ))}
-      </div>
     </div>
   );
 }
@@ -277,12 +328,21 @@ function MenusPanel({ menus, menuCategories }) {
               key={menu?._id || `menu-${index}`}
               className="border-b border-white/18 pb-6 last:border-b-0 last:pb-0"
             >
-              <div className="flex items-center justify-between gap-4">
-                <h3 className="text-[24px] font-medium uppercase tracking-[0.03em]">
+              <div
+                className="flex items-center justify-between gap-4"
+                data-print-title-price-row
+              >
+                <h3
+                  className="text-[24px] font-medium uppercase tracking-[0.03em]"
+                  data-print-title
+                >
                   {getMenuTitle(menu, index)}
                 </h3>
                 {priceLabel ? (
-                  <span className="shrink-0 text-[23px] leading-none text-nowrap">
+                  <span
+                    className="shrink-0 text-[23px] leading-none text-nowrap"
+                    data-print-price
+                  >
                     {priceLabel}
                   </span>
                 ) : null}
@@ -439,7 +499,10 @@ function CategoryBand({ categories }) {
   );
 }
 
-export default function ListMenusComponent({ restaurantData }) {
+export default function ListMenusComponent({
+  restaurantData,
+  printMode = false,
+}) {
   const orderedCategories = buildOrderedCategories(
     getVisibleDishCategories(restaurantData),
   );
@@ -455,11 +518,13 @@ export default function ListMenusComponent({ restaurantData }) {
       className="site-shell relative overflow-visible px-5 pb-14 pt-0 tablet:px-8 tablet:pb-16 desktop:px-[44px] desktop:pb-20"
     >
       <div className="mx-auto max-w-[1730px]">
-        <CategoryBand categories={orderedCategories} />
+        {!printMode ? <CategoryBand categories={orderedCategories} /> : null}
 
         <div className="mt-8 space-y-6 tablet:mt-10 tablet:space-y-8">
           {firstCategory ? (
-            <div className="grid gap-6 desktop:grid-cols-[1.05fr_0.9fr_0.72fr]">
+            <div
+              className={`grid gap-6 ${printMode ? "" : "desktop:grid-cols-[1.05fr_0.9fr_0.72fr]"}`}
+            >
               <RevealOnScrollComponent
                 variant="up"
                 className="rounded-[10px] border border-[rgba(20,72,47,0.14)] bg-white/62 p-6 tablet:p-8"
@@ -467,18 +532,22 @@ export default function ListMenusComponent({ restaurantData }) {
                 <CategoryList category={firstCategory} />
               </RevealOnScrollComponent>
 
-              <RevealOnScrollComponent variant="zoom">
-                <MediaCard image={firstCategory.image} />
-              </RevealOnScrollComponent>
-
-              <div className="relative hidden self-start desktop:block desktop:sticky desktop:top-[104px]">
-                <RevealOnScrollComponent variant="up">
-                  <MenusPanel
-                    menus={visibleMenus}
-                    menuCategories={visibleMenuCategories}
-                  />
+              {!printMode ? (
+                <RevealOnScrollComponent variant="zoom">
+                  <MediaCard image={firstCategory.image} />
                 </RevealOnScrollComponent>
-              </div>
+              ) : null}
+
+              {!printMode ? (
+                <div className="relative hidden self-start desktop:block desktop:sticky desktop:top-[104px]">
+                  <RevealOnScrollComponent variant="up">
+                    <MenusPanel
+                      menus={visibleMenus}
+                      menuCategories={visibleMenuCategories}
+                    />
+                  </RevealOnScrollComponent>
+                </div>
+              ) : null}
             </div>
           ) : null}
 
@@ -489,9 +558,11 @@ export default function ListMenusComponent({ restaurantData }) {
               <div
                 key={category.anchorId}
                 className={`grid gap-6 ${
-                  isTextLeft
-                    ? "desktop:grid-cols-[2fr_1fr]"
-                    : "desktop:grid-cols-[1fr_2fr]"
+                  printMode
+                    ? ""
+                    : isTextLeft
+                      ? "desktop:grid-cols-[2fr_1fr]"
+                      : "desktop:grid-cols-[1fr_2fr]"
                 }`}
               >
                 <RevealOnScrollComponent
@@ -503,17 +574,21 @@ export default function ListMenusComponent({ restaurantData }) {
                   <CategoryList category={category} />
                 </RevealOnScrollComponent>
 
-                <RevealOnScrollComponent
-                  variant="zoom"
-                  className={isTextLeft ? "desktop:order-2" : "desktop:order-1"}
-                >
-                  <MediaCard image={category.image} />
-                </RevealOnScrollComponent>
+                {!printMode ? (
+                  <RevealOnScrollComponent
+                    variant="zoom"
+                    className={
+                      isTextLeft ? "desktop:order-2" : "desktop:order-1"
+                    }
+                  >
+                    <MediaCard image={category.image} />
+                  </RevealOnScrollComponent>
+                ) : null}
               </div>
             );
           })}
 
-          <div className="desktop:hidden">
+          <div className={printMode ? "" : "desktop:hidden"}>
             <RevealOnScrollComponent variant="up">
               <MenusPanel
                 menus={visibleMenus}
@@ -522,22 +597,26 @@ export default function ListMenusComponent({ restaurantData }) {
             </RevealOnScrollComponent>
           </div>
 
-          <div className="grid items-stretch gap-6 desktop:grid-cols-[0.72fr_1.28fr]">
-            <RevealOnScrollComponent variant="up" className="h-full">
-              <SuggestionCard />
-            </RevealOnScrollComponent>
+          {!printMode ? (
+            <div className="grid items-stretch gap-6 desktop:grid-cols-[0.72fr_1.28fr]">
+              <RevealOnScrollComponent variant="up" className="h-full">
+                <SuggestionCard />
+              </RevealOnScrollComponent>
 
-            <RevealOnScrollComponent variant="up" className="h-full">
-              <CocktailSignatureCard />
-            </RevealOnScrollComponent>
-          </div>
+              <RevealOnScrollComponent variant="up" className="h-full">
+                <CocktailSignatureCard />
+              </RevealOnScrollComponent>
+            </div>
+          ) : null}
         </div>
 
-        <ReservationCtaComponent
-          phone={restaurantData?.phone}
-          phoneLabel={phoneLabel}
-          className="mt-10 rounded-[8px]"
-        />
+        {!printMode ? (
+          <ReservationCtaComponent
+            phone={restaurantData?.phone}
+            phoneLabel={phoneLabel}
+            className="mt-10 rounded-[8px]"
+          />
+        ) : null}
       </div>
     </section>
   );

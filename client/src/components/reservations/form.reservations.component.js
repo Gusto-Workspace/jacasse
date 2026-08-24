@@ -512,7 +512,9 @@ export default function FormReservationComponent({
       setSuccessMessage(
         isWaitlistRequest
           ? "Votre demande a été ajoutée à la liste d’attente. Vous recevrez un email si une place se libère."
-          : "Votre réservation a bien été effectuée. Nous avons bien reçu votre demande.",
+          : Boolean(restaurant?.reservationsSettings?.auto_accept)
+            ? "Votre réservation est confirmée. Pour la modifier ou l’annuler, contactez directement le restaurant ou utilisez le lien présent dans l’e-mail de confirmation."
+            : "Votre demande de réservation est en attente de confirmation. Dès qu’elle sera confirmée, vous pourrez la modifier ou l’annuler en contactant directement le restaurant ou en utilisant le lien présent dans l’e-mail de confirmation.",
       );
       if (router.query.reservationDate || router.query.reservationTime) {
         await router.replace("/reservations", undefined, { shallow: true });
@@ -886,7 +888,7 @@ export default function FormReservationComponent({
 
                 <div className="flex items-center justify-center gap-3 text-[16px] text-[var(--site-ink)]">
                   <Check size={20} strokeWidth={2.1} className="text-[var(--site-orange)]" />
-                  <p>Vous recevrez un email de confirmation.</p>
+                  <p>Vous recevrez un e-mail indiquant le statut de votre demande. Le lien de l’e-mail de confirmation permettra ensuite de modifier ou d’annuler votre réservation.</p>
                 </div>
               </form>
             ) : (
