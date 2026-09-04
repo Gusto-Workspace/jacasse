@@ -588,7 +588,10 @@ export default function ListMenusComponent({
             );
           })}
 
-          <div className={printMode ? "" : "desktop:hidden"}>
+          <div
+            className={printMode ? "" : "desktop:hidden"}
+            data-print-menus-start={printMode ? "true" : undefined}
+          >
             <RevealOnScrollComponent variant="up">
               <MenusPanel
                 menus={visibleMenus}
