@@ -26,6 +26,7 @@ export default function EditReservationAvailability({
   const datePickerRef = useRef(null);
   const [reservationsList, setReservationsList] = useState([]);
   const [slotCoverUsage, setSlotCoverUsage] = useState([]);
+  const [serviceCoverUsage, setServiceCoverUsage] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [availabilityError, setAvailabilityError] = useState("");
 
@@ -37,6 +38,7 @@ export default function EditReservationAvailability({
         if (isCurrent) {
           setReservationsList([]);
           setSlotCoverUsage([]);
+          setServiceCoverUsage([]);
           setIsLoading(false);
         }
         return;
@@ -70,11 +72,17 @@ export default function EditReservationAvailability({
           setSlotCoverUsage(
             Array.isArray(data?.slotCoverUsage) ? data.slotCoverUsage : [],
           );
+          setServiceCoverUsage(
+            Array.isArray(data?.serviceCoverUsage)
+              ? data.serviceCoverUsage
+              : [],
+          );
         }
       } catch (error) {
         if (isCurrent) {
           setReservationsList([]);
           setSlotCoverUsage([]);
+          setServiceCoverUsage([]);
           setAvailabilityError(
             error?.message || "Impossible de charger les créneaux disponibles.",
           );
@@ -99,6 +107,7 @@ export default function EditReservationAvailability({
         restaurant,
         reservationsList,
         slotCoverUsage,
+        serviceCoverUsage,
         excludeReservationId: reservation?._id,
       }).filter((option) => option.type === "available"),
     [
@@ -107,6 +116,7 @@ export default function EditReservationAvailability({
       restaurant,
       reservationsList,
       slotCoverUsage,
+      serviceCoverUsage,
       reservation?._id,
     ],
   );
