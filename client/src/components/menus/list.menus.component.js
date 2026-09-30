@@ -237,7 +237,10 @@ function renderMenuBlockLine(line, key) {
 
   return (
     <p key={key} className="text-[14px] leading-[1.45] text-white/88">
-      {line}
+      {line?.name || line}
+      {line?.description ? (
+        <span className="block text-[0.85em] text-white/60">{line.description}</span>
+      ) : null}
     </p>
   );
 }
